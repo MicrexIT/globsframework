@@ -25,3 +25,19 @@ globs_ex-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+
+# Common additions for various operating systems:
+# MacOS
+.DS_Store
+
+# Common additions for various editors:
+# JetBrains IDEA, IntelliJ, PyCharm, RubyMine etc.
+.idea 
+
+.vscode
+
+*.iml
+globs_framework.iml
+
+.elixir_ls

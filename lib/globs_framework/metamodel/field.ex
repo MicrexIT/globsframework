@@ -1,31 +1,51 @@
 defmodule GlobsFramework.Metamodel.Field do
-  @doc """
-  Holds the data-structure information for a globType's field
+  @moduledoc """
+  Used to hold the type information of a field as well as its name
   """
-  defstruct [:name, :type, :globType]
-  alias GlobsFramework.DataTypes.DataType
-  alias GlobsFramework.Metamodel.Field
+  alias __MODULE__
 
-  @spec checkValue(%Field{}, any) :: boolean
-  def checkValue(%Field{type: type}, value) do
-    DataType.check_value_type(value, type)
+  alias GlobsFramework.DataTypes
+  alias GlobsFramework.Model.{Glob}
+  alias GlobsFramework.Metamodel.{GlobType}
+
+  @type t :: %Field{
+          name: String.t(),
+          type: atom,
+          key_field?: boolean,
+          annotations: %{
+            String.t() => Glob.t()
+          },
+          glob_type: GlobType.t()
+        }
+  defstruct [:name, :type, :key_field?, :annotations, :glob_type]
+
+  @spec check_value(Field.t(), any) :: boolean
+  def check_value(%Field{type: type}, value) do
+    DataTypes.check_value_type(value, type)
   end
 
-  # use Agent
+  @spec get_data_type(Field.t()) :: atom()
+  def get_data_type(%Field{type: type}) do
+    type
+  end
 
-  # def start_link(%{name: name, type: type, ref: globTypePid}) do
-  #   Agent.start_link(fn -> %{name: name, type: type, ref: globTypePid} end)
-  # end
+  @spec get_name(Field.t()) :: String.t()
+  def get_name(%Field{name: name}) do
+    name
+  end
 
-  # def get(pid, :name) do
-  #   Agent.get(pid, fn %{name: name} -> name end)
-  # end
+  @spec key?(Field.t()) :: boolean
+  def key?(%Field{key_field?: key_field}) do
+    key_field
+  end
 
-  # def get(pid, :type) do
-  #   Agent.get(pid, fn %{type: type} -> type end)
-  # end
+  @spec get_glob_type(Field.t()) :: GlobType.t() | nil
+  def get_glob_type(%Field{glob_type: glob_type}) do
+    glob_type
+  end
 
-  # def get(pid) do
-  #   Agent.get(pid, fn state -> state end)
-  # end
+  @spec get_annotations(Field.t()) :: [Glob]
+  def get_annotations(%Field{annotations: annotations}) do
+    Enum.map(annotations, fn {_, annotation} -> annotation end)
+  end
 end

@@ -1,27 +1,45 @@
 defmodule GlobsFramework.Metamodel.GlobType do
-  @doc """
-  Shapes the structure of some data (glob) through holding fields that maps to
-  data types as well as a meta information and the ability to instantiate a glob
-  """
-  @enforce_keys [:name]
-  defstruct [:name, fields: %{}]
-  alias GlobsFramework.Metamodel.GlobType
+  alias __MODULE__
+  alias GlobsFramework.Metamodel.Field
+  alias GlobsFramework.Model.Glob
 
-  def getName(%GlobType{name: name}) do
+  @moduledoc """
+  Has a name and hold fields
+  """
+  @type t :: %GlobType{
+          name: String.t(),
+          fields: %{
+            String.t() => Field.t()
+          },
+          annotations: %{String.t() => Glob.t()}
+        }
+  @enforce_keys [:name]
+  defstruct [:name, :fields, :annotations]
+
+  @spec get_name(GlobType.t()) :: String.t()
+  def get_name(%GlobType{name: name}) do
     name
   end
 
-  def getFields(%GlobType{fields: fields}) do
+  @spec get_fields(GlobType.t()) :: list(Field.t())
+  def get_fields(%GlobType{fields: fields}) do
+    Map.values(fields)
+  end
+
+  @spec get_key_fields(GlobType.t()) :: list(Field.t())
+  def get_key_fields(%GlobType{fields: fields}) do
     fields
+    |> Map.values()
+    |> Enum.filter(fn field -> Field.key?(field) end)
   end
 
-  def getField(%GlobType{fields: fields}, :name) do
-    Map.get(fields, :name, nil)
+  @spec get_field(GlobType.t(), String.t()) :: Field.t()
+  def get_field(%GlobType{fields: fields}, name) do
+    Map.get(fields, name, nil)
   end
 
-  def addField(%GlobType{fields: fields}, field) do
-    # todo: test with duplicate
-    {name} = field
-    Map.put(fields, name, field)
+  @spec instantiate(GlobType.t()) :: GlobsFramework.Model.Glob.t()
+  def instantiate(globType) do
+    GlobsFramework.Model.Glob.init(globType)
   end
 end
